@@ -1,0 +1,110 @@
+1. to increase salary of employees in the department 30 by 8%
+
+CREATE OR REPLACE PROCEDURE in_salary
+    (dept_no IN EMP.DEPTNO%TYPE)
+IS
+BEGIN
+    UPDATE EMP
+    SET SAL=SAL+SAL*(8/100)
+    WHERE DEPTNO=dept_no;
+    
+END in_salary;
+
+EXECUTE in_salary(30);
+************************************************************
+
+2.to calculate the Total take home(sal+comm) of an employee ( take input from User / environment)
+
+
+CREATE OR REPLACE PROCEDURE new_sal
+    (emp_no IN EMP.EMPNO%TYPE)
+IS
+BEGIN
+    UPDATE EMP
+    SET SAL=SAL+COMM
+    WHERE EMPNO=emp_no;
+END new_sal;
+
+EXECUTE new_sal(7521);
+SELECT SAL FROM EMP;
+*****************************************************************
+
+3.  To display the name of department and who earns highest in the department.
+
+CREATE OR REPLACE FUNCTION highest_paid
+(dept_no IN EMP.DEPTNO%TYPE,
+d_dname IN DEPT.DNAME%TYPE,
+d_name IN EMP.ENAME%TYPE)
+RETURN VARCHAR
+IS 
+v_dname DEPT.DNAME%TYPE:=0;
+v_name EMP.ENAME%TYPE:=0;
+v_sal EMP.SAL%TYPE:=0;
+BEGIN
+SELECT d_dname,d_name,SAL
+INTO v_dname,v_name,v_sal
+FROM DEPT d,EMP d
+WHERE SAL=(SELECT MAX(SAL)
+FROM EMP d
+WHERE dept_no=d.DEPTNO);
+END highest_paid;
+
+
+CREATE OR REPLACE FUNCTION highest_paid
+(dept_no IN EMP.DEPTNO%TYPE,
+d_dname OUT DEPT.DNAME%TYPE,
+d_name OUT EMP.ENAME%TYPE)
+RETURN VARCHAR
+IS 
+v_dname DEPT.DNAME%TYPE:=0;
+v_name EMP.ENAME%TYPE:=0;
+--v_sal EMP.SAL%TYPE:=0;
+BEGIN
+SELECT d_dname,d_name
+INTO v_dname,v_name
+FROM DEPT d,EMP d
+WHERE SAL=(SELECT MAX(SAL)
+FROM EMP d
+WHERE dept_no=d.DEPTNO);
+RETURN v_dname,v_name,v_sal;
+END highest_paid;
+
+********************************************
+4. to display the employee ID, first name, job title and the hire date.
+DECLARE
+  
+  CURSOR emp_cursor IS
+    SELECT empno,ename,job, hiredate
+    FROM EMP;
+    emp_record emp_cursor%ROWTYPE;
+BEGIN
+  OPEN emp_cursor;
+  LOOP
+    FETCH emp_cursor INTO emp_record;
+    EXIT WHEN emp_cursor%ROWCOUNT > 10 OR emp_cursor%NOTFOUND;
+    DBMS_OUTPUT.PUT_LINE (TO_CHAR(emp_record.empno)||' '|| emp_record.ename||' '||emp_record.job||' '||TO_CHAR(emp_record.hiredate));
+  END LOOP;
+  CLOSE emp_cursor;
+END ;
+
+
+
+********************************************
+5. to display department name, Manager of the department and location.
+DECLARE
+   CURSOR c_emp (p_job VARCHAR2) is
+      SELECT DISTINCT e.ename,d.dname,d.loc
+      FROM emp e, dept d
+      WHERE JOB LIKE p_job and e.deptno=d.deptno;
+       C_emp_REC c_emp%ROWTYPE;
+BEGIN
+   OPEN c_emp('MANAGER');
+   LOOP
+      FETCH c_emp into C_emp_REC;
+      EXIT WHEN c_emp%NOTFOUND;
+      dbms_output.put_line(rpad(C_emp_REC.dname,12,' ')||' '||rpad(C_emp_REC.ename,6,' ')||' '||TO_CHAR(C_emp_REC.loc));  
+   END LOOP;
+   CLOSE c_emp;
+END;
+
+

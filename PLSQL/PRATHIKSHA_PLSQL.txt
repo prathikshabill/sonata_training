@@ -1,0 +1,153 @@
+1. Display unique jobs from the emp table.
+
+BEGIN
+    FOR v in(SELECT DISTINCT JOB 
+    FROM EMP) 
+    LOOP
+    dbms_output.put_line(v.job);
+    END LOOP;
+END;
+-------------------------------------------------------------------
+2.Display the name and salary of employees earning more than 2850.
+
+BEGIN
+    FOR v in(SELECT DISTINCT ENAME, SAL 
+    FROM EMP
+    WHERE SAL>2850) 
+    LOOP
+    dbms_output.put_line(v.ENAME||' - '||v.SAL);
+    END LOOP;
+END;
+-----------------------------------------------------------------------------------------
+3.Create a query to display the employee name and department number for employee SMITH
+
+BEGIN
+    FOR v in(SELECT DISTINCT ENAME, DEPTNO 
+    FROM EMP
+    WHERE ENAME='SMITH') 
+    LOOP
+    dbms_output.put_line(v.ENAME||' - '||v.DEPTNO);
+    END LOOP;
+END;
+
+or
+
+DECLARE
+v_name CHAR(6);
+v_dno NUMBER;
+BEGIN
+    SELECT ENAME, DEPTNO 
+    INTO v_name,v_dno
+    FROM EMP
+    WHERE ENAME='SMITH';
+    
+    dbms_output.put_line(v_name||' - '||v_dno);
+    
+END;
+-----------------------------------------------------------------------------
+4. Display the name and title of all employees who do not have a manager
+
+BEGIN
+    FOR v in (
+    SELECT ENAME, JOB 
+    FROM EMP
+    WHERE MGR IS NULL)
+    LOOP
+    dbms_output.put_line(v.ename||' - '||v.job);
+    END LOOP;
+    
+END;
+--------------------------------------------------------------------------------------------
+5. Retrieve the analysts’ record with the hiredate formatted as ‘the 3rd of Decemeber, 1984’.
+
+BEGIN
+    FOR v in (
+    SELECT ENAME, JOB, HIREDATE
+    FROM EMP
+    WHERE JOB='ANALYST'AND HIREDATE='03-12-1981')
+    LOOP
+    dbms_output.put_line(v.ename||' - '||v.job||' - '||'3rd of December,1981');
+    END LOOP;
+    
+END;
+
+------------------------------------------------------------------------------------------
+
+Write a PL/SQL program to count the number of employees in a specific department given by the user and check whether this department have any vacancies or not. If any vacancies, how many vacancies are in that department.
+Consider the maximum allowed number of employees in any department is 10.
+For example if any department is having 7 employees the vacancy in that department is 3 (10-7)
+
+
+DECLARE
+    v_count NUMBER;
+v_dno NUMBER;
+    v_name CHAR(20);
+BEGIN
+    v_dno := '&v_dno';
+    SELECT Count(*),dname
+    INTO   v_count,v_name
+    FROM  emp e
+           join dept d
+             ON e.deptno = d.deptno
+    WHERE  e.deptno = v_dno
+    group by dname;
+    dbms_output.Put_line ('The number of employees in department '||trim(v_name)||' are: '
+                          ||To_char(v_count));
+    IF v_count >= 10 THEN
+      dbms_output.Put_line ('There are no vacancies in the department '||v_dno);
+    ELSE
+      dbms_output.Put_line ('There are '||to_char(10-v_count)||' vacancies in department '|| trim(v_name ));
+    END IF;
+END;
+
+------------------------------------------------------------------------------------------------------
+
+Write a block in PL/SQL to print the department name, Manager of the department, city and number of employees are working in that department.
+ 
+CREATE OR REPLACE PROCEDURE in_salary
+    (deptno IN EMP.DEPTNO%TYPE)
+IS
+BEGIN
+    UPDATE EMP
+    SET SAL=SAL+SAL*0.8
+    WHERE DEPTNO=deptno;
+    
+END in_salary;
+\\\\\\\\\\\\\\\\
+CREATE OR REPLACE PROCEDURE in_salary
+    (dept_no IN EMP.DEPTNO%TYPE)
+IS
+BEGIN
+    UPDATE EMP
+    SET SAL=SAL*0.8
+    WHERE DEPTNO=dept_no;
+    
+END in_salary;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
