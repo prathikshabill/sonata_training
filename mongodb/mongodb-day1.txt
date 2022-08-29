@@ -23,9 +23,10 @@ db.movie.update(
    } 
 ) 
 
-db.movie.update( 
+db.db.movie.update( 
    { "title":"Pulp Fiction" }, 
    { 
-     $set : {"actors": "Samuel L. Jackson"}    
+     $set : {"actors": ["John Travolta","Uma Thurman","Samuel L. Jackson"]}    
    } 
+) 
 ) 
